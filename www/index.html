@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> -->
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width,target-densitydpi=low-dpi" />
+		<!-- <meta name="viewport" content="initial-scale=1, width=device-width" /> -->		
+        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.4.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/ondutyCSS.css" />
+		<link rel="stylesheet" href="css/my_custom_Theme.min.css" />
+        <title>值日生</title>
+    </head>
+	
+	<script type="text/javascript" src="cordova.js"></script>
+    <script src="js/jquery-2.1.1.min.js"></script> 
+    <script src="js/jquery.mobile-1.4.4.min.js"></script>
+
+    <body>
+        <div data-role="page" id="PageStart" data-theme="a">
+		    <header  data-role="header" id="header_top">
+                <a href="#PageConf" id="a_conf" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">  設定  </a>
+                <p class="ui-title"> 值日生輪值</p>
+                <a href="#"  id="a_exit1"   class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-action">  離開  </a>
+            </header>
+
+            <section role="main" class="ui-content">
+                <section id="showonduty">
+                    <h1 class="text_center">尚未設定</h1>
+                </section>
+            </section>			
+			<section data-role="footer" data-position="fixed">Ver:1.1</section>
+
+		</div> <!-- PageStart End -->
+
+        <div data-role="page" id="PageConf">
+            <header  data-role="header" id="Confheader_top">
+                <p class="ui-title">設定</p>
+                <a href="#PageStart"  id="a_back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-arrow-l">返回</a>
+                <a href="#" id="a_exit2" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-action">離開</a>
+
+            </header>
+
+            <section role="main" class="ui-content">
+               <label for="sliderTotal">輪值的組數</label>
+               <input type="range" name="sliderTotal" id="sliderTotal" min="2" max="20" value="10">
+			   <label for="sliderDay">每組輪值的天數</label>
+               <input type="range" name="sliderDay" id="sliderDay" min="1" max="15" value="1">
+			   <label for="dateStart">我開始輪值的第一個日期:</label>
+               <input type="date" name="dateStart" id="dateStart" value="2014-01-01">
+			   <label>
+			   <input type="checkbox" name="SaturdayChk" id="SaturdayChk" data-theme="a">星期六有輪值
+			   </label>
+			   <br />
+			   <input type="button" id="btnSave" value="儲存">
+			</section>
+
+        </div> <!-- PageConf End -->
+
+    </body>
+</html>
+			
+    <script type="text/javascript">
+	
+        //app.initialize();
+		
+		//離開程式
+        $("#a_exit1").click(function(){
+			if (navigator.app) {
+                navigator.app.exitApp();
+            }
+			else if (navigator.device) {
+                navigator.device.exitApp();
+            }
+        });
+		
+		//離開程式
+        $("#a_exit2").click(function(){
+			if (navigator.app) {
+                navigator.app.exitApp();
+            }
+			else if (navigator.device) {
+                navigator.device.exitApp();
+            }
+        });
+		
+		
+        //document.addEventListener("deviceready",onDeviceReady,false);   
+
+        //function onDeviceReady() {
+				    
+			//用PageShow事件來載入程式，否則slider('refresh')會產生cannot call methods to initialization錯誤。
+			//猜測應該是page在未Change之前，元素不會被jQuery抓到
+		    $("#PageConf").on("pageshow",function(event,ui) {
+			    var Today = new Date();			            
+			    $("#dateStart").val(Today.getFullYear() + "-" + (Today.getMonth() + 1) + "-0" + Today.getDate()) ; //月份是0到11，所以要再加1		
+			    if ( localStorage.getItem("totalGroup") ) {
+			        $("#sliderTotal").val(localStorage.getItem("totalGroup"));
+				    $("#sliderTotal").slider('refresh');
+			    }
+				if ( localStorage.getItem("cycleDay") ) {
+			        $("#sliderDay").val(localStorage.getItem("cycleDay"));
+				    $("#sliderDay").slider('refresh');
+			    }
+				if ( localStorage.getItem("dateStart") ) {
+			        $("#dateStart").val(localStorage.getItem("dateStart"));
+			    }
+				if ( localStorage.getItem("SaturdayChk")) { //先判斷有無值，因為第一次啟動時，是沒有值的。
+				    if (  localStorage.getItem("SaturdayChk") == "yes" ) {
+					    $("input[type='checkbox']:first").attr("checked",true).checkboxradio("refresh");
+					} else {
+					    $("input[type='checkbox']:first").attr("checked",false).checkboxradio("refresh");
+					}
+				}
+				
+			});
+			
+			$("#PageStart").on("pageshow",function(event,ui) {
+			    if (localStorage.getItem("dateStart") && localStorage.getItem("totalGroup") && localStorage.getItem("cycleDay") && localStorage.getItem("SaturdayChk")) {
+				    var SaturdayChk;
+					if ( localStorage.getItem("SaturdayChk") == "yes" ) { //判斷星期六是否需要輪值
+					    SaturdayChk = "summary";
+					} else {
+					    SaturdayChk = "weekend" ;
+					}		
+					
+				    if (ondutyME(localStorage.getItem("dateStart"),new Date(),localStorage.getItem("totalGroup"),localStorage.getItem("cycleDay"),SaturdayChk )) {
+				        $("#showonduty").html('<p class="BigRedText">我是今天的值日生</p>');					
+                    } else {
+                       	$("#showonduty").html('<p class="SmallBlueText">我不是今天的值日生</p>');					
+				    }
+				}
+			});		
+					
+			
+			//儲存按鈕
+			$("#btnSave").click(function() {
+				if (!$("#dateStart").val() ) {
+				    alert("日期未選擇");
+				} else {
+				    localStorage.setItem("totalGroup",$("#sliderTotal").val());
+				    localStorage.setItem("cycleDay",$("#sliderDay").val());
+					localStorage.setItem("dateStart",$("#dateStart").val());
+					if ( $("#SaturdayChk").prop("checked") ) {
+					    localStorage.setItem("SaturdayChk","yes");
+					} else {
+					    localStorage.setItem("SaturdayChk","no");
+					}
+				    alert("設定儲存成功");
+				}
+			});
+				
+		
+		//判斷是否為值日生
+		function ondutyME(v_sDate,v_tDate,v_totalGroup,v_cycleDay,v_type) {
+		    var tDate = new Date(v_tDate);
+			var sDate = new Date(v_sDate);		
+		    var diffDay ;
+			switch (v_type) {
+			    case "summary" :
+			        diffDay = DateDiff(sDate,tDate,"summary") ;
+					break;
+				case "weekend" :
+				    diffDay = DateDiff(sDate,tDate,"weekend") ;
+					break;
+			}
+			
+			
+			var chk = Math.floor((diffDay / v_cycleDay)) ;
+			var chk1 = diffDay % v_cycleDay;
+			if ( chk1 > 0 ) {
+			    chk = chk +1 ;
+			}
+			chk = chk % v_totalGroup;
+			if ( chk == 1 ) {
+			    return true;
+			} else { 
+			    return false;
+			}				
+		} //defaultShow End
+		
+		
+		//兩個日期的差異天數，vType是summary表示排除星期日；Weekend表示排除週末（含星期六）傳回天數
+		function DateDiff(sDate,eDate,vType) {
+		    var tmpDay ;
+			var tmpDay2 ;
+			var weekendDay = 0 ;
+			var summaryDay = 0;
+			var diffDay = 0 ;
+            var handleVal ;
+			var sDate = new Date(sDate);
+			var eDate = new Date(eDate);
+			
+			diffDay = parseInt(Math.abs(eDate - sDate) / 1000 / 60 / 60 / 24) + 1 ; //日期的差異天數
+			if ( parseInt(sDate.getDay()) == 0 ) { //星期日
+			    tmpDay = 1;
+			} else { 
+				tmpDay = 7 - parseInt(sDate.getDay()) + 1; //距離第一個星期日還有幾天（包含今天+1）
+			}				
+			tmpDay2 = diffDay - tmpDay; 
+			summaryDay = 1 + Math.floor(( tmpDay2 / 7 ));				
+			
+			switch (vType) {
+			    case "summary":
+				    return diffDay - summaryDay ;
+					break;
+				case "weekend":
+				    if ( parseInt(sDate.getDay()) == 6 ) { //星期六
+			            tmpDay = 1;
+			        } else {
+				        tmpDay = 7 - parseInt(sDate.getDay()) + 1; //距離第一個星期日還有幾天（包含今天+1）
+			        }				
+			        tmpDay2 = diffDay - tmpDay; 
+			        weekendDay = 1 + Math.floor(( tmpDay2 / 7 )); //無條件捨去（取小於數值的最小整數值）
+                    return diffDay - (weekendDay + summaryDay) ;					
+				    break;
+			}			
+		}  //DateDiff End
+		
+		//日期天數加減，傳回日期
+		function Datehandle(sDate,vInt) {
+		    var NewDate = new Date(Math.abs(sDate + (i *1000*60*60*24))) ;
+			return NewDate ;
+		}  // Datehandle End 
+		
+		
+		
+		//alert(D_date.getDay());
+			
+        
+		//} // onDeviceReady End
+    </script>
+	

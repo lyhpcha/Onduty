@@ -1,0 +1,24 @@
+
+/* 置中 */
+.text_center {
+	text-align: center;
+}
+
+/* 靠右 */
+.text_right {
+	text-align: right;
+}
+
+/* 置中且加大文字（紅字） */
+.BigRedText {
+    color:red ;
+	font-size:250% ;
+	text-align: center;
+}
+
+/* 置中且加大文字（藍字） */
+.SmallBlueText {
+    color:blue ;
+	font-size:200% ;
+	text-align: center;
+}
