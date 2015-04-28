@@ -1,4 +1,4 @@
-# onduty
+# 值生日輪值
 利用phonegap+Html5的第一個小型值日生輪值系統
 
 這個是我第一個嘗試以HTML5+jQuery Mobile來製作的網頁型APP，
